@@ -44,15 +44,11 @@ class MovieController extends Controller
             'api_key' => $apiKey,
             "append_to_response" => 'credits,videos,images'
         ])->json();
-            
+
         
         $genreArray =  Http::get('https://api.themoviedb.org/3/genre/movie/list', [
             'api_key' => $apiKey,
         ])->json()["genres"];
-
-
-        
-        dump($movie);
 
         return view("show", [
             "movie" => $movie,
