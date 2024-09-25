@@ -1,0 +1,60 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      args:
+        user: adi
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: laravel:1.0.0
+    container_name: laravel-docker
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - laravel-networks
+
+  db:
+    image: mysql:8.0
+    container_name: laravel-docker-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: user
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    networks:
+      - laravel-networks
+
+  nginx:
+    image: nginx:alpine
+    container_name: laravel-docker-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - laravel-networks
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: laravel-docker-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 9001:80
+    networks:
+      - laravel-networks
+
+networks:
+  laravel-networks:
+    driver: bridge
